@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mouse</title>
+    <link rel="stylesheet" href="mouse.css">
+    <script type="text/javascript" src="paper-full.js"></script>
+    <script type="text/paperscript" canvas="canvas">
+        // Adapted from the following Processing example:
+        // http://processing.org/learning/topics/follow3.html
+        var color = '#0fbe25'
+        var color2 = '#FF0000'
+        var color3 = '#0000FF'
+
+        // The amount of points in the path:
+        var points = 25;
+
+        // The distance between the points:
+        var length = 35;
+
+        var path = new Path({
+            strokeColor: color,
+            strokeWidth: 20,
+            strokeCap: 'round'
+        });
+
+        var start = view.center / [10, 1];
+        for (var i = 0; i < points; i++)
+            path.add(start + new Point(i * length, 0));
+
+        function onMouseMove(event) {
+            path.firstSegment.point = event.point;
+            
+            for (var i = 0; i < points - 1; i++) {
+                var segment = path.segments[i];
+                var nextSegment = segment.next;
+                var vector = segment.point - nextSegment.point;
+                vector.length = length;
+                nextSegment.point = segment.point - vector;
+            }
+            path.smooth({ type: 'continuous' });
+        }
+
+        function onMouseDown(event) {
+            path.fullySelected = true;
+            var rand = Math.random();
+            if (rand < 0.3) {
+                path.strokeColor = color;
+            } else if (rand >= 0.3 && rand < 0.6) {
+                path.strokeColor = color2;
+            } else {
+                path.strokeColor = color3;
+            }
+        }
+
+        function onMouseUp(event) {
+            path.fullySelected = false;
+            path.strokeColor = color;
+        }
+    </script>
+</head>
+
+<body>
+    <canvas id="canvas" resize></canvas>
+</body>
+
+</html>
